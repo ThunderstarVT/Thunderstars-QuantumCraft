@@ -3,6 +3,8 @@ package net.thunderstar__vt.quantumcraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.thunderstar__vt.quantumcraft.object.dataComponent.ModDataComponents;
+import net.thunderstar__vt.quantumcraft.object.item.ModItems;
 import net.thunderstar__vt.quantumcraft.util.Reference;
 
 import net.neoforged.bus.api.IEventBus;
@@ -22,13 +24,16 @@ public class Main {
 
         NeoForge.EVENT_BUS.register(this);
 
+        ModDataComponents.register(modEventBus);
+        ModItems.register(modEventBus);
+
         modEventBus.addListener(this::addCreative);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
-
+        Reference.Setup();
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
