@@ -2,6 +2,7 @@ package net.thunderstar__vt.quantumcraft.object.item.custom;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
@@ -9,6 +10,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.thunderstar__vt.quantumcraft.object.dataComponent.ModDataComponents;
+import net.thunderstar__vt.quantumcraft.util.ChemUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -92,7 +94,14 @@ public class ElementItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        if (Screen.hasShiftDown()) {
+            AtomData data = stack.getOrDefault(ModDataComponents.ATOM_DATA.value(), AtomData.DEFAULT);
 
+            tooltipComponents.add(Component.translatable("tooltip.quantumcraft.element.size",
+                    ChemUtils.formatUnit(ChemUtils.computeAtomSize(data), ChemUtils.Unit.ANGSTROM)));
+        } else {
+            tooltipComponents.add(Component.translatable("tooltip.quantumcraft.hold_shift"));
+        }
     }
 
     @Override

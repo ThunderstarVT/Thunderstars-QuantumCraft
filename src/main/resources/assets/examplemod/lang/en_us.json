@@ -11,5 +11,8 @@
   "text.quantumcraft.anti": "Anti ",
   "text.quantumcraft.charge.neutral": "",
   "text.quantumcraft.charge.positive": " +%1$s",
-  "text.quantumcraft.charge.negative": " -%1$s"
+  "text.quantumcraft.charge.negative": " -%1$s",
+
+  "tooltip.quantumcraft.element.size": "§bAtomic Radius: §e%1$s§b§r",
+  "tooltip.quantumcraft.hold_shift": "§7Hold Shift for details§r"
 }

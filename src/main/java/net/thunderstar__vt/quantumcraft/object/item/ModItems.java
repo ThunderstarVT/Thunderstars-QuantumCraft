@@ -14,7 +14,7 @@ public class ModItems {
 
 
     public static final DeferredItem<ElementItem> ELEMENT = ITEMS.register("element",
-            () -> new ElementItem(new Item.Properties().stacksTo(1024)));
+            () -> new ElementItem(new Item.Properties().stacksTo(96)));
 
 
     public static ItemStack createElementStack(int protons, int neutrons, int electrons, boolean muonic) {
