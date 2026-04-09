@@ -1,7 +1,15 @@
 {
+  "creativetab.quantumcraft.elements": "QuantumCraft Elements",
+
+  "element.quantumcraft.hydrogen": "Hydrogen",
+
+  "item.quantumcraft.element.format": "%1$s%2$s%3$s-%4$s%5$s",
+
   "quantumcraft.configuration.machineProcessingThreads": "Machine Processing Threads",
 
-  "item.quantumcraft.element.format": "%1$s%2$s-%3$s%4$s",
-
-  "text.quantumcraft.charge.neutral": ""
+  "text.quantumcraft.muonic": "Muonic ",
+  "text.quantumcraft.anti": "Anti ",
+  "text.quantumcraft.charge.neutral": "",
+  "text.quantumcraft.charge.positive": " +%1$s",
+  "text.quantumcraft.charge.negative": " -%1$s"
 }

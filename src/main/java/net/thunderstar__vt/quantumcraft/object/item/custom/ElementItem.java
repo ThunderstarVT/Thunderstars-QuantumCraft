@@ -15,14 +15,15 @@ import java.util.List;
 import java.util.Map;
 
 public class ElementItem extends Item {
-    public record AtomData(int protons, int neutrons, int electrons) {
-        public static final AtomData DEFAULT = new AtomData(1, 0, 1);
+    public record AtomData(int protons, int neutrons, int electrons, boolean muonic) {
+        public static final AtomData DEFAULT = new AtomData(1, 0, 1, false);
 
         public static final Codec<AtomData> CODEC = RecordCodecBuilder.create(instance ->
                 instance.group(
                         Codec.INT.fieldOf("protons").forGetter(AtomData::protons),
                         Codec.INT.fieldOf("neutrons").forGetter(AtomData::neutrons),
-                        Codec.INT.fieldOf("electrons").forGetter(AtomData::electrons)
+                        Codec.INT.fieldOf("electrons").forGetter(AtomData::electrons),
+                        Codec.BOOL.fieldOf("muonic").forGetter(AtomData::muonic)
                 ).apply(instance, AtomData::new)
         );
 
@@ -32,11 +33,13 @@ public class ElementItem extends Item {
                             buf.writeInt(data.protons());
                             buf.writeInt(data.neutrons());
                             buf.writeInt(data.electrons());
+                            buf.writeBoolean(data.muonic());
                         },
                         buf -> new AtomData(
                                 buf.readInt(),
                                 buf.readInt(),
-                                buf.readInt()
+                                buf.readInt(),
+                                buf.readBoolean()
                         )
                 );
     }
@@ -60,6 +63,10 @@ public class ElementItem extends Item {
 
         Component elementName = ElementRegistry.getName(p);
 
+        Component muonic = data.muonic
+                ? Component.translatable("text.quantumcraft.muonic")
+                : Component.empty();
+
         Component anti = isAnti
                 ? Component.translatable("text.quantumcraft.anti")
                 : Component.empty();
@@ -70,11 +77,12 @@ public class ElementItem extends Item {
         } else if (charge > 0) {
             chargeText = Component.translatable("text.quantumcraft.charge.positive", charge);
         } else {
-            chargeText = Component.translatable("text.quantumcraft.charge.negative", Math.abs(charge));
+            chargeText = Component.translatable("text.quantumcraft.charge.negative", -charge);
         }
 
         return Component.translatable(
                 "item.quantumcraft.element.format",
+                muonic,
                 anti,
                 elementName,
                 isotope,
@@ -101,133 +109,134 @@ public class ElementItem extends Item {
         return stack;
     }
 
+
     public class ElementRegistry {
         private static final Map<Integer, String> NAMES = new HashMap<>();
 
         static {
             NAMES.put(0, "neutronium");
             NAMES.put(1, "hydrogen");
-            NAMES.put(2, "");
-            NAMES.put(3, "");
-            NAMES.put(4, "");
-            NAMES.put(5, "");
-            NAMES.put(6, "");
-            NAMES.put(7, "");
-            NAMES.put(8, "");
-            NAMES.put(9, "");
-            NAMES.put(10, "");
-            NAMES.put(11, "");
-            NAMES.put(12, "");
-            NAMES.put(13, "");
-            NAMES.put(14, "");
-            NAMES.put(15, "");
-            NAMES.put(16, "");
-            NAMES.put(17, "");
-            NAMES.put(18, "");
-            NAMES.put(19, "");
-            NAMES.put(20, "");
-            NAMES.put(21, "");
-            NAMES.put(22, "");
-            NAMES.put(23, "");
-            NAMES.put(24, "");
-            NAMES.put(25, "");
-            NAMES.put(26, "");
-            NAMES.put(27, "");
-            NAMES.put(28, "");
-            NAMES.put(29, "");
-            NAMES.put(30, "");
-            NAMES.put(31, "");
-            NAMES.put(32, "");
-            NAMES.put(33, "");
-            NAMES.put(34, "");
-            NAMES.put(35, "");
-            NAMES.put(36, "");
-            NAMES.put(37, "");
-            NAMES.put(38, "");
-            NAMES.put(39, "");
-            NAMES.put(40, "");
-            NAMES.put(41, "");
-            NAMES.put(42, "");
-            NAMES.put(43, "");
-            NAMES.put(44, "");
-            NAMES.put(45, "");
-            NAMES.put(46, "");
-            NAMES.put(47, "");
-            NAMES.put(48, "");
-            NAMES.put(49, "");
-            NAMES.put(50, "");
-            NAMES.put(51, "");
-            NAMES.put(52, "");
-            NAMES.put(53, "");
-            NAMES.put(54, "");
-            NAMES.put(55, "");
-            NAMES.put(56, "");
-            NAMES.put(57, "");
-            NAMES.put(58, "");
-            NAMES.put(59, "");
-            NAMES.put(60, "");
-            NAMES.put(61, "");
-            NAMES.put(62, "");
-            NAMES.put(63, "");
-            NAMES.put(64, "");
-            NAMES.put(65, "");
-            NAMES.put(66, "");
-            NAMES.put(67, "");
-            NAMES.put(68, "");
-            NAMES.put(69, "");
-            NAMES.put(70, "");
-            NAMES.put(71, "");
-            NAMES.put(72, "");
-            NAMES.put(73, "");
-            NAMES.put(74, "");
-            NAMES.put(75, "");
-            NAMES.put(76, "");
-            NAMES.put(77, "");
-            NAMES.put(78, "");
-            NAMES.put(79, "");
-            NAMES.put(80, "");
-            NAMES.put(81, "");
-            NAMES.put(82, "");
-            NAMES.put(83, "");
-            NAMES.put(84, "");
-            NAMES.put(85, "");
-            NAMES.put(86, "");
-            NAMES.put(87, "");
-            NAMES.put(88, "");
-            NAMES.put(89, "");
-            NAMES.put(90, "");
-            NAMES.put(91, "");
-            NAMES.put(92, "");
-            NAMES.put(93, "");
-            NAMES.put(94, "");
-            NAMES.put(95, "");
-            NAMES.put(96, "");
-            NAMES.put(97, "");
-            NAMES.put(98, "");
-            NAMES.put(99, "");
-            NAMES.put(100, "");
-            NAMES.put(101, "");
-            NAMES.put(102, "");
-            NAMES.put(103, "");
-            NAMES.put(104, "");
-            NAMES.put(105, "");
-            NAMES.put(106, "");
-            NAMES.put(107, "");
-            NAMES.put(108, "");
-            NAMES.put(109, "");
-            NAMES.put(110, "");
-            NAMES.put(111, "");
-            NAMES.put(112, "");
-            NAMES.put(113, "");
-            NAMES.put(114, "");
-            NAMES.put(115, "");
-            NAMES.put(116, "");
-            NAMES.put(117, "");
-            NAMES.put(118, "");
+            NAMES.put(2, "helium");
+            NAMES.put(3, "lithium");
+            NAMES.put(4, "beryllium");
+            NAMES.put(5, "boron");
+            NAMES.put(6, "carbon");
+            NAMES.put(7, "nitrogen");
+            NAMES.put(8, "oxygen");
+            NAMES.put(9, "fluorine");
+            NAMES.put(10, "neon");
+            NAMES.put(11, "sodium");
+            NAMES.put(12, "magnesium");
+            NAMES.put(13, "aluminum");
+            NAMES.put(14, "silicon");
+            NAMES.put(15, "phosphorus");
+            NAMES.put(16, "sulfur");
+            NAMES.put(17, "chlorine");
+            NAMES.put(18, "argon");
+            NAMES.put(19, "potassium");
+            NAMES.put(20, "calcium");
+            NAMES.put(21, "scandium");
+            NAMES.put(22, "titanium");
+            NAMES.put(23, "vanadium");
+            NAMES.put(24, "chromium");
+            NAMES.put(25, "manganese");
+            NAMES.put(26, "iron");
+            NAMES.put(27, "cobalt");
+            NAMES.put(28, "nickel");
+            NAMES.put(29, "copper");
+            NAMES.put(30, "zinc");
+            NAMES.put(31, "gallium");
+            NAMES.put(32, "germanium");
+            NAMES.put(33, "arsenic");
+            NAMES.put(34, "selenium");
+            NAMES.put(35, "bromine");
+            NAMES.put(36, "krypton");
+            NAMES.put(37, "rubidium");
+            NAMES.put(38, "strontium");
+            NAMES.put(39, "yttrium");
+            NAMES.put(40, "zirconium");
+            NAMES.put(41, "niobium");
+            NAMES.put(42, "molybdenum");
+            NAMES.put(43, "technetium");
+            NAMES.put(44, "ruthenium");
+            NAMES.put(45, "rhodium");
+            NAMES.put(46, "palladium");
+            NAMES.put(47, "silver");
+            NAMES.put(48, "cadmium");
+            NAMES.put(49, "indium");
+            NAMES.put(50, "tin");
+            NAMES.put(51, "antimony");
+            NAMES.put(52, "tellurium");
+            NAMES.put(53, "iodine");
+            NAMES.put(54, "xenon");
+            NAMES.put(55, "caesium");
+            NAMES.put(56, "barium");
+            NAMES.put(57, "lanthanum");
+            NAMES.put(58, "cerium");
+            NAMES.put(59, "praseodymium");
+            NAMES.put(60, "neodymium");
+            NAMES.put(61, "promethium");
+            NAMES.put(62, "samarium");
+            NAMES.put(63, "europium");
+            NAMES.put(64, "gadolinium");
+            NAMES.put(65, "terbium");
+            NAMES.put(66, "dysprosium");
+            NAMES.put(67, "holmium");
+            NAMES.put(68, "erbium");
+            NAMES.put(69, "thulium");
+            NAMES.put(70, "ytterbium");
+            NAMES.put(71, "lutetium");
+            NAMES.put(72, "hafnium");
+            NAMES.put(73, "tantalum");
+            NAMES.put(74, "tungsten");
+            NAMES.put(75, "rhenium");
+            NAMES.put(76, "osmium");
+            NAMES.put(77, "iridium");
+            NAMES.put(78, "platinum");
+            NAMES.put(79, "gold");
+            NAMES.put(80, "mercury");
+            NAMES.put(81, "thallium");
+            NAMES.put(82, "lead");
+            NAMES.put(83, "bismuth");
+            NAMES.put(84, "polonium");
+            NAMES.put(85, "astatine");
+            NAMES.put(86, "radon");
+            NAMES.put(87, "francium");
+            NAMES.put(88, "radium");
+            NAMES.put(89, "actinium");
+            NAMES.put(90, "thorium");
+            NAMES.put(91, "protactinium");
+            NAMES.put(92, "uranium");
+            NAMES.put(93, "neptunium");
+            NAMES.put(94, "plutonium");
+            NAMES.put(95, "americium");
+            NAMES.put(96, "curium");
+            NAMES.put(97, "berkelium");
+            NAMES.put(98, "californium");
+            NAMES.put(99, "einsteinium");
+            NAMES.put(100, "fermium");
+            NAMES.put(101, "mendelevium");
+            NAMES.put(102, "nobelium");
+            NAMES.put(103, "lawrencium");
+            NAMES.put(104, "rutherfordium");
+            NAMES.put(105, "dubnium");
+            NAMES.put(106, "seaborgium");
+            NAMES.put(107, "bohrium");
+            NAMES.put(108, "hassium");
+            NAMES.put(109, "meitnerium");
+            NAMES.put(110, "darmstadtium");
+            NAMES.put(111, "roentgenium");
+            NAMES.put(112, "copernicium");
+            NAMES.put(113, "nihonium");
+            NAMES.put(114, "flerovium");
+            NAMES.put(115, "moscovium");
+            NAMES.put(116, "livermorium");
+            NAMES.put(117, "tennessine");
+            NAMES.put(118, "oganesson");
         }
 
         public static Component getName(int protons) {
-            //if (NAMES.containsKey(protons)) return Component.translatable("element.quantumcraft." + NAMES.get(protons));
+            if (NAMES.containsKey(protons)) return Component.translatable("element.quantumcraft." + NAMES.get(protons));
 
             return getSystematicName(protons);
         }
