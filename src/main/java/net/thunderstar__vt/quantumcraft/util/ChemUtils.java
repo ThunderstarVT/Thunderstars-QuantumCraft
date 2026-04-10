@@ -157,7 +157,7 @@ public class ChemUtils {
             filledOrbitals.add(new FilledOrbital(orbital.n, orbital.l, fill));
         }
 
-        double S = 0.0f;
+        double S = -0.30f;
 
         for (FilledOrbital orbital : filledOrbitals) {
             if (orbital.n == n_eff) {
@@ -179,7 +179,14 @@ public class ChemUtils {
 
         double Z_eff = data.protons() - S;
 
-        double size = 0;
+        double r = 0.69315; // temp, solution for H
+
+        double mu = ((data.muonic() ? MUON_MASS : ELECTRON_MASS) * (data.protons()*PROTON_MASS + data.neutrons()*NEUTRON_MASS))
+                /((data.muonic() ? MUON_MASS : ELECTRON_MASS) + (data.protons()*PROTON_MASS + data.neutrons()*NEUTRON_MASS));
+
+        double magicConstant = 1.0;
+
+        double size = magicConstant * r * (data.muonic() ? MUON_MASS : ELECTRON_MASS) / mu;
 
         cachedAtomSize.put(data, size);
         return size;
