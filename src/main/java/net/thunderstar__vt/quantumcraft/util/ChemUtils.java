@@ -32,20 +32,24 @@ public class ChemUtils {
     public static Component formatUnit(double value, Unit unit) {
         String str;
 
-        int exponent_base = (int) Math.floor(Math.log(Math.abs(value)) / Math.log(unit.getBase()));
-
-        if (unit.getPrefixes().containsKey(exponent_base)) {
-            double scaled = value / Math.pow(unit.getBase(), exponent_base);
-
-            String prefix = unit.getPrefixes().get(exponent_base);
-
-            str = String.format("%.3f %s%s", scaled, prefix, unit.getUnit());
+        if (value == 0.0) {
+            str = String.format("%.3f %s", value, unit.getUnit());
         } else {
-            int exponent = (int) Math.floor(Math.log10(Math.abs(value)));
+            int exponent_base = (int) Math.floor(Math.log(Math.abs(value)) / Math.log(unit.getBase()));
 
-            double scaled = value / Math.pow(10, exponent);
+            if (unit.getPrefixes().containsKey(exponent_base)) {
+                double scaled = value / Math.pow(unit.getBase(), exponent_base);
 
-            str = String.format("%.3fe+%d %s", scaled, exponent, unit.getUnit());
+                String prefix = unit.getPrefixes().get(exponent_base);
+
+                str = String.format("%.3f %s%s", scaled, prefix, unit.getUnit());
+            } else {
+                int exponent = (int) Math.floor(Math.log10(Math.abs(value)));
+
+                double scaled = value / Math.pow(10, exponent);
+
+                str = String.format("%.3fe+%d %s", scaled, exponent, unit.getUnit());
+            }
         }
 
         return Component.literal(str);
@@ -179,14 +183,18 @@ public class ChemUtils {
 
         double Z_eff = data.protons() - S;
 
-        double r = 0.69315; // temp, solution for H
+        double r = (n_eff / Z_eff) * MathUtils.regularizedGammaPFindMedianT(n_eff);
 
         double mu = ((data.muonic() ? MUON_MASS : ELECTRON_MASS) * (data.protons()*PROTON_MASS + data.neutrons()*NEUTRON_MASS))
                 /((data.muonic() ? MUON_MASS : ELECTRON_MASS) + (data.protons()*PROTON_MASS + data.neutrons()*NEUTRON_MASS));
 
-        double magicConstant = 1.0;
+        double magicNumber = 0.875 * Math.pow(1.15, -n_eff);
 
-        double size = magicConstant * r * (data.muonic() ? MUON_MASS : ELECTRON_MASS) / mu;
+        double cloudSize = magicNumber * r * ELECTRON_MASS / mu;
+
+        double nucleusSize = 1.6836e-5 * Math.cbrt(data.protons() + data.neutrons());
+
+        double size = Math.max(cloudSize, nucleusSize);
 
         cachedAtomSize.put(data, size);
         return size;
