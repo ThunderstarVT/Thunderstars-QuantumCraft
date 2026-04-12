@@ -1,51 +1,41 @@
 package net.thunderstar__vt.quantumcraft.util;
 
+import java.util.function.IntToDoubleFunction;
+
 public class MathUtils {
-    public static double regularizedGammaP(int n, double t) {
-        double sum = 1.0;
-        double term = 1.0;
+    public static double sum(int start, int end, IntToDoubleFunction function) {
+        double total = 0.0;
 
-        for (int k = 1; k < n; k++) {
-            term *= t / k;
-            sum += term;
+        for (int i = start; i <= end; i++) {
+            total += function.applyAsDouble(i);
         }
 
-        return 1.0 - Math.exp(-t) * sum;
+        return total;
     }
 
-    public static double regularizedGammaPDF(int n, double t) {
-        double term = 1.0;
+    public static double product(int start, int end, IntToDoubleFunction function) {
+        double total = 1.0;
 
-        for (int k = 1; k < n; k++) {
-            term *= t / k;
+        for (int i = start; i <= end; i++) {
+            total *= function.applyAsDouble(i);
         }
 
-        return term * Math.exp(-t);
-    }
-
-    public static double regularizedGammaPFindMedianT(int n) {
-        double t = Math.max(1e-6, n - 1.0/3.0);
-
-        for (int i = 0; i < 20; i++) {
-            double P = regularizedGammaP(n, t);
-            double dP = regularizedGammaPDF(n, t);
-
-            double F = P - 0.5;
-
-            double step = F / dP;
-            t -= step;
-
-            if (t <= 0) {
-                t = 1e-6;
-            }
-
-            if (Math.abs(step) < 1e-12) {
-                break;
-            }
-        }
-
-        return t;
+        return total;
     }
 
 
+    public static double choose(int n, int k) {
+        return product(1, k, i -> (double)(n + 1 - i) / i);
+    }
+
+
+    public static double factorial(int n) {
+        if (n < 0) return Double.NaN;
+        return product(1, n, i -> i);
+    }
+
+
+    public static double laguerrePolynomial(int k, int a, double x) {
+        return sum(0, k, m -> (Math.pow(-1, m)/factorial(m)) * choose(k + a, k - m) * Math.pow(x, m));
+    }
 }

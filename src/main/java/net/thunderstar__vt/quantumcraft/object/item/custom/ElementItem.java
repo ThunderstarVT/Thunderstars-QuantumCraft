@@ -2,19 +2,27 @@ package net.thunderstar__vt.quantumcraft.object.item.custom;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.thunderstar__vt.quantumcraft.object.dataComponent.ModDataComponents;
+import net.thunderstar__vt.quantumcraft.object.keybind.ModKeybinds;
 import net.thunderstar__vt.quantumcraft.util.ChemUtils;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class ElementItem extends Item {
     public record AtomData(int protons, int neutrons, int electrons, boolean muonic) {
@@ -54,18 +62,18 @@ public class ElementItem extends Item {
     public Component getName(ItemStack stack) {
         AtomData data = stack.getOrDefault(ModDataComponents.ATOM_DATA.value(), AtomData.DEFAULT);
 
-        int p = data.protons;
-        int n = data.neutrons;
-        int e = data.electrons;
+        int p = data.protons();
+        int n = data.neutrons();
+        int e = data.electrons();
 
         int charge = p - e;
-        int isotope = p + n;
+        int isotope = Math.abs(p + n);
 
         boolean isAnti = p < 0 || (p == 0 && n < 0);
 
-        Component elementName = ElementRegistry.getName(p);
+        Component elementName = ElementRegistry.getName(Math.abs(p));
 
-        Component muonic = data.muonic
+        Component muonic = data.muonic()
                 ? Component.translatable("text.quantumcraft.muonic")
                 : Component.empty();
 
@@ -94,13 +102,16 @@ public class ElementItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        if (Screen.hasShiftDown()) {
+        if (ModKeybinds.isDown(ModKeybinds.SHOW_DETAILS)) {
             AtomData data = stack.getOrDefault(ModDataComponents.ATOM_DATA.value(), AtomData.DEFAULT);
 
+            tooltipComponents.add(Component.translatable("tooltip.quantumcraft.element.mass",
+                    ChemUtils.formatUnit(ChemUtils.computeAtomMass(data), ChemUtils.Unit.ELECTRON_VOLT, 'e')));
             tooltipComponents.add(Component.translatable("tooltip.quantumcraft.element.size",
-                    ChemUtils.formatUnit(ChemUtils.computeAtomSize(data), ChemUtils.Unit.ANGSTROM)));
+                    ChemUtils.formatUnit(ChemUtils.computeAtomSize(data), ChemUtils.Unit.ANGSTROM, 'e')));
         } else {
-            tooltipComponents.add(Component.translatable("tooltip.quantumcraft.hold_shift"));
+            tooltipComponents.add(Component.translatable("tooltip.quantumcraft.hold_shift",
+                    Component.keybind("key.quantumcraft.show_details").withStyle(ChatFormatting.ITALIC)));
         }
     }
 
@@ -244,10 +255,140 @@ public class ElementItem extends Item {
             NAMES.put(118, "oganesson");
         }
 
+        private static final Map<Integer, String> SYMBOLS = new HashMap<>();
+
+        static {
+            SYMBOLS.put(0, "n");
+            SYMBOLS.put(1, "H");
+            SYMBOLS.put(2, "He");
+            SYMBOLS.put(3, "Li");
+            SYMBOLS.put(4, "Be");
+            SYMBOLS.put(5, "B");
+            SYMBOLS.put(6, "C");
+            SYMBOLS.put(7, "N");
+            SYMBOLS.put(8, "O");
+            SYMBOLS.put(9, "F");
+            SYMBOLS.put(10, "Ne");
+            SYMBOLS.put(11, "Na");
+            SYMBOLS.put(12, "Mg");
+            SYMBOLS.put(13, "Al");
+            SYMBOLS.put(14, "Si");
+            SYMBOLS.put(15, "P");
+            SYMBOLS.put(16, "S");
+            SYMBOLS.put(17, "Cl");
+            SYMBOLS.put(18, "Ar");
+            SYMBOLS.put(19, "K");
+            SYMBOLS.put(20, "Ca");
+            SYMBOLS.put(21, "Sc");
+            SYMBOLS.put(22, "Ti");
+            SYMBOLS.put(23, "V");
+            SYMBOLS.put(24, "Cr");
+            SYMBOLS.put(25, "Mn");
+            SYMBOLS.put(26, "Fe");
+            SYMBOLS.put(27, "Co");
+            SYMBOLS.put(28, "Ni");
+            SYMBOLS.put(29, "Cu");
+            SYMBOLS.put(30, "Zn");
+            SYMBOLS.put(31, "Ga");
+            SYMBOLS.put(32, "Ge");
+            SYMBOLS.put(33, "As");
+            SYMBOLS.put(34, "Se");
+            SYMBOLS.put(35, "Br");
+            SYMBOLS.put(36, "Kr");
+            SYMBOLS.put(37, "Rb");
+            SYMBOLS.put(38, "Sr");
+            SYMBOLS.put(39, "Y");
+            SYMBOLS.put(40, "Zr");
+            SYMBOLS.put(41, "Nb");
+            SYMBOLS.put(42, "Mo");
+            SYMBOLS.put(43, "Tc");
+            SYMBOLS.put(44, "Ru");
+            SYMBOLS.put(45, "Rh");
+            SYMBOLS.put(46, "Pd");
+            SYMBOLS.put(47, "Ag");
+            SYMBOLS.put(48, "Cd");
+            SYMBOLS.put(49, "In");
+            SYMBOLS.put(50, "Sn");
+            SYMBOLS.put(51, "Sb");
+            SYMBOLS.put(52, "Te");
+            SYMBOLS.put(53, "I");
+            SYMBOLS.put(54, "Xe");
+            SYMBOLS.put(55, "Cs");
+            SYMBOLS.put(56, "Ba");
+            SYMBOLS.put(57, "La");
+            SYMBOLS.put(58, "Ce");
+            SYMBOLS.put(59, "Pr");
+            SYMBOLS.put(60, "Nd");
+            SYMBOLS.put(61, "Pm");
+            SYMBOLS.put(62, "Sm");
+            SYMBOLS.put(63, "Eu");
+            SYMBOLS.put(64, "Gd");
+            SYMBOLS.put(65, "Tb");
+            SYMBOLS.put(66, "Dy");
+            SYMBOLS.put(67, "Ho");
+            SYMBOLS.put(68, "Er");
+            SYMBOLS.put(69, "Tm");
+            SYMBOLS.put(70, "Yb");
+            SYMBOLS.put(71, "Lu");
+            SYMBOLS.put(72, "Hf");
+            SYMBOLS.put(73, "Ta");
+            SYMBOLS.put(74, "W");
+            SYMBOLS.put(75, "Re");
+            SYMBOLS.put(76, "Os");
+            SYMBOLS.put(77, "Ir");
+            SYMBOLS.put(78, "Pt");
+            SYMBOLS.put(79, "Au");
+            SYMBOLS.put(80, "Hg");
+            SYMBOLS.put(81, "Tl");
+            SYMBOLS.put(82, "Pb");
+            SYMBOLS.put(83, "Bi");
+            SYMBOLS.put(84, "Po");
+            SYMBOLS.put(85, "At");
+            SYMBOLS.put(86, "Rn");
+            SYMBOLS.put(87, "Fr");
+            SYMBOLS.put(88, "Ra");
+            SYMBOLS.put(89, "Ac");
+            SYMBOLS.put(90, "Th");
+            SYMBOLS.put(91, "Pa");
+            SYMBOLS.put(92, "U");
+            SYMBOLS.put(93, "Np");
+            SYMBOLS.put(94, "Pu");
+            SYMBOLS.put(95, "Am");
+            SYMBOLS.put(96, "Cm");
+            SYMBOLS.put(97, "Bk");
+            SYMBOLS.put(98, "Cf");
+            SYMBOLS.put(99, "Es");
+            SYMBOLS.put(100, "Fm");
+            SYMBOLS.put(101, "Md");
+            SYMBOLS.put(102, "No");
+            SYMBOLS.put(103, "Lr");
+            SYMBOLS.put(104, "Rf");
+            SYMBOLS.put(105, "Db");
+            SYMBOLS.put(106, "Sg");
+            SYMBOLS.put(107, "Bh");
+            SYMBOLS.put(108, "Hs");
+            SYMBOLS.put(109, "Mt");
+            SYMBOLS.put(110, "Ds");
+            SYMBOLS.put(111, "Rg");
+            SYMBOLS.put(112, "Cn");
+            SYMBOLS.put(113, "Nh");
+            SYMBOLS.put(114, "Fl");
+            SYMBOLS.put(115, "Mc");
+            SYMBOLS.put(116, "Lv");
+            SYMBOLS.put(117, "Ts");
+            SYMBOLS.put(118, "Og");
+        }
+
         public static Component getName(int protons) {
             if (NAMES.containsKey(protons)) return Component.translatable("element.quantumcraft." + NAMES.get(protons));
 
             return getSystematicName(protons);
+        }
+
+        public static String getSymbol(int protons) {
+            if (SYMBOLS.containsKey(protons)) return SYMBOLS.get(protons);
+
+            return buildSystematicSymbol(protons);
         }
 
         private static final String[] ROOTS = {
@@ -261,6 +402,19 @@ public class ElementItem extends Item {
                 "sept",
                 "oct",
                 "enn"
+        };
+
+        private static final String[] ROOTS_SYMBOL = {
+                "n",
+                "u",
+                "b",
+                "t",
+                "q",
+                "p",
+                "h",
+                "s",
+                "o",
+                "e"
         };
 
         public static Component getSystematicName(int protons) {
@@ -277,6 +431,20 @@ public class ElementItem extends Item {
             }
 
             name.append(name.toString().endsWith("i") ? "um" : "ium");
+
+            String nameStr = name.toString();
+
+            return nameStr.substring(0, 1).toUpperCase() + nameStr.substring(1).toLowerCase();
+        }
+
+        private static String buildSystematicSymbol(int protons) {
+            String digits = String.valueOf(protons);
+            StringBuilder name = new StringBuilder();
+
+            for (char c : digits.toCharArray()) {
+                int digit = c - '0';
+                name.append(ROOTS[digit]);
+            }
 
             String nameStr = name.toString();
 
