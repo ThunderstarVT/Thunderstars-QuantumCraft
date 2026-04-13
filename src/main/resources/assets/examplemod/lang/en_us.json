@@ -122,6 +122,10 @@
   "element.quantumcraft.oganesson": "Oganesson",
 
   "item.quantumcraft.element.format": "%1$s%2$s%3$s-%4$s%5$s",
+  "item.quantumcraft.photon": "Photon",
+
+  "key.categories.quantumcraft": "QuantumCraft",
+  "key.quantumcraft.show_details": "Show Details",
 
   "quantumcraft.configuration.machineProcessingThreads": "Machine Processing Threads",
 

@@ -4,20 +4,20 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.thunderstar__vt.quantumcraft.object.dataComponent.ModDataComponents;
 import net.thunderstar__vt.quantumcraft.object.keybind.ModKeybinds;
-import net.thunderstar__vt.quantumcraft.util.ChemUtils;
+import net.thunderstar__vt.quantumcraft.util.PhysUtils;
+import net.thunderstar__vt.quantumcraft.util.QuantUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -101,19 +101,29 @@ public class ElementItem extends Item {
     }
 
     @Override
+    public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
+        if (ModKeybinds.isDown(ModKeybinds.SHOW_DETAILS)) {
+            Optional.of(stack.getOrDefault(ModDataComponents.ATOM_DATA.value(), AtomData.DEFAULT)).map(ElementTooltip::new);
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         if (ModKeybinds.isDown(ModKeybinds.SHOW_DETAILS)) {
             AtomData data = stack.getOrDefault(ModDataComponents.ATOM_DATA.value(), AtomData.DEFAULT);
 
             tooltipComponents.add(Component.translatable("tooltip.quantumcraft.element.mass",
-                    ChemUtils.formatUnit(ChemUtils.computeAtomMass(data), ChemUtils.Unit.ELECTRON_VOLT, 'e')));
+                    PhysUtils.formatUnit(QuantUtils.computeAtomMass(data), PhysUtils.Unit.ELECTRON_VOLT, 'e')));
             tooltipComponents.add(Component.translatable("tooltip.quantumcraft.element.size",
-                    ChemUtils.formatUnit(ChemUtils.computeAtomSize(data), ChemUtils.Unit.ANGSTROM, 'e')));
+                    PhysUtils.formatUnit(QuantUtils.computeAtomSize(data), PhysUtils.Unit.ANGSTROM, 'e')));
         } else {
             tooltipComponents.add(Component.translatable("tooltip.quantumcraft.hold_shift",
                     Component.keybind("key.quantumcraft.show_details").withStyle(ChatFormatting.ITALIC)));
         }
     }
+
 
     @Override
     public void verifyComponentsAfterLoad(ItemStack stack) {
@@ -127,6 +137,28 @@ public class ElementItem extends Item {
         ItemStack stack = super.getDefaultInstance();
         stack.set(ModDataComponents.ATOM_DATA.value(), AtomData.DEFAULT);
         return stack;
+    }
+
+
+    public record ElementTooltip(AtomData data) implements TooltipComponent {}
+
+    @OnlyIn(Dist.CLIENT)
+    public class ClientElementTooltip implements ClientTooltipComponent {
+        private final AtomData data;
+
+        ClientElementTooltip(AtomData data) {
+            this.data = data;
+        }
+
+        @Override
+        public int getHeight() {
+            return 40;
+        }
+
+        @Override
+        public int getWidth(Font font) {
+            return 0;
+        }
     }
 
 
@@ -443,7 +475,7 @@ public class ElementItem extends Item {
 
             for (char c : digits.toCharArray()) {
                 int digit = c - '0';
-                name.append(ROOTS[digit]);
+                name.append(ROOTS_SYMBOL[digit]);
             }
 
             String nameStr = name.toString();

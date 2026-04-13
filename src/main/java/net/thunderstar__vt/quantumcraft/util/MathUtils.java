@@ -38,4 +38,10 @@ public class MathUtils {
     public static double laguerrePolynomial(int k, int a, double x) {
         return sum(0, k, m -> (Math.pow(-1, m)/factorial(m)) * choose(k + a, k - m) * Math.pow(x, m));
     }
+
+
+    public static double gaussian(double x, double mean, double sigma) {
+        double d = (x - mean) / sigma;
+        return Math.exp(-0.5 * d * d);
+    }
 }
