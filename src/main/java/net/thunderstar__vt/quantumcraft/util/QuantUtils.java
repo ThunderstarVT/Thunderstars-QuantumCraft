@@ -71,35 +71,7 @@ public class QuantUtils {
     }
 
     private static double getLeptonicBindingEnergy(int Z, int N, int L, double leptonMass) {
-        List<ElectronOrbital> orbitals = new ArrayList<>();
-
-        int maxN = 10 + (int)Math.ceil(Math.cbrt(Math.abs(L))) * 3;
-        for (int n = 1; n < maxN; n++) {
-            for (int l = 0; l < n; l++) {
-                orbitals.add(new ElectronOrbital(n, l));
-            }
-        }
-
-        orbitals.sort((a, b) -> {
-            int sumA = a.n + a.l;
-            int sumB = b.n + b.l;
-
-            if (sumA != sumB) return Integer.compare(sumA, sumB);
-            return Integer.compare(a.n, b.n);
-        });
-
-        int remaining = Math.abs(L);
-
-        List<FilledOrbital> filledOrbitals = new ArrayList<>();
-
-        for (ElectronOrbital orbital : orbitals) {
-            if (remaining <= 0) break;
-
-            int fill = Math.min(remaining, orbital.capacity);
-            remaining -= fill;
-
-            filledOrbitals.add(new FilledOrbital(orbital.n, orbital.l, fill));
-        }
+        List<FilledOrbital> filledOrbitals = getFilledOrbitals(L);
 
         double E = 0.0;
 
@@ -129,35 +101,7 @@ public class QuantUtils {
             return Double.POSITIVE_INFINITY;
         }
 
-        List<ElectronOrbital> orbitals = new ArrayList<>();
-
-        int maxN = 10 + (int)Math.ceil(Math.cbrt(Math.abs(data.electrons()))) * 3;
-        for (int n = 1; n < maxN; n++) {
-            for (int l = 0; l < n; l++) {
-                orbitals.add(new ElectronOrbital(n, l));
-            }
-        }
-
-        orbitals.sort((a, b) -> {
-            int sumA = a.n + a.l;
-            int sumB = b.n + b.l;
-
-            if (sumA != sumB) return Integer.compare(sumA, sumB);
-            return Integer.compare(a.n, b.n);
-        });
-
-        int remaining = Math.abs(data.electrons());
-
-        List<FilledOrbital> filledOrbitals = new ArrayList<>();
-
-        for (ElectronOrbital orbital : orbitals) {
-            if (remaining <= 0) break;
-
-            int fill = Math.min(remaining, orbital.capacity);
-            remaining -= fill;
-
-            filledOrbitals.add(new FilledOrbital(orbital.n, orbital.l, fill));
-        }
+        List<FilledOrbital> filledOrbitals = getFilledOrbitals(data.electrons());
 
         double r = 0.0;
 
@@ -241,7 +185,7 @@ public class QuantUtils {
         }
     }
 
-    private static class FilledOrbital extends ElectronOrbital {
+    public static class FilledOrbital extends ElectronOrbital {
         public final int electrons;
 
         public FilledOrbital(int n, int l, int electrons) {
@@ -250,6 +194,42 @@ public class QuantUtils {
             this.electrons = electrons;
         }
     }
+
+
+    public static List<FilledOrbital> getFilledOrbitals(int electrons) {
+        List<ElectronOrbital> orbitals = new ArrayList<>();
+
+        int maxN = 10 + (int)Math.ceil(Math.cbrt(Math.abs(electrons))) * 3;
+        for (int n = 1; n < maxN; n++) {
+            for (int l = 0; l < n; l++) {
+                orbitals.add(new ElectronOrbital(n, l));
+            }
+        }
+
+        orbitals.sort((a, b) -> {
+            int sumA = a.n + a.l;
+            int sumB = b.n + b.l;
+
+            if (sumA != sumB) return Integer.compare(sumA, sumB);
+            return Integer.compare(a.n, b.n);
+        });
+
+        int remaining = Math.abs(electrons);
+
+        List<FilledOrbital> filledOrbitals = new ArrayList<>();
+
+        for (ElectronOrbital orbital : orbitals) {
+            if (remaining <= 0) break;
+
+            int fill = Math.min(remaining, orbital.capacity);
+            remaining -= fill;
+
+            filledOrbitals.add(new FilledOrbital(orbital.n, orbital.l, fill));
+        }
+
+        return filledOrbitals;
+    }
+
 
     public static int shellCapacity(int shell) {
         return 2*(shell+1)*(shell+1);
