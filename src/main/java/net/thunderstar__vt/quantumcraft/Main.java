@@ -15,6 +15,7 @@ import net.thunderstar__vt.quantumcraft.object.item.ModItems;
 import net.thunderstar__vt.quantumcraft.object.item.custom.ElementItem;
 import net.thunderstar__vt.quantumcraft.object.itemDecorator.ModItemDecorators;
 import net.thunderstar__vt.quantumcraft.object.keybind.ModKeybinds;
+import net.thunderstar__vt.quantumcraft.object.tooltipComponent.ModTooltipComponents;
 import net.thunderstar__vt.quantumcraft.util.Reference;
 
 import net.neoforged.bus.api.IEventBus;
@@ -84,7 +85,7 @@ public class Main {
 
         @SubscribeEvent
         public static void registerTooltipComponents(RegisterClientTooltipComponentFactoriesEvent event) {
-            event.register(ElementItem.ElementTooltip.class, ElementItem.ClientElementTooltip::new);
+            ModTooltipComponents.register(event);
         }
     }
 }

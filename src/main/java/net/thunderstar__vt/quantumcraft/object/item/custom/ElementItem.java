@@ -17,6 +17,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.thunderstar__vt.quantumcraft.object.dataComponent.ModDataComponents;
 import net.thunderstar__vt.quantumcraft.object.keybind.ModKeybinds;
+import net.thunderstar__vt.quantumcraft.object.tooltipComponent.custom.ElementTooltip;
 import net.thunderstar__vt.quantumcraft.util.PhysUtils;
 import net.thunderstar__vt.quantumcraft.util.QuantUtils;
 
@@ -104,7 +105,7 @@ public class ElementItem extends Item {
     @Override
     public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
         if (ModKeybinds.isDown(ModKeybinds.SHOW_DETAILS)) {
-            Optional.of(stack.getOrDefault(ModDataComponents.ATOM_DATA.value(), AtomData.DEFAULT)).map(ElementTooltip::new);
+            return Optional.of(stack.getOrDefault(ModDataComponents.ATOM_DATA.value(), AtomData.DEFAULT)).map(ElementTooltip::new);
         }
 
         return Optional.empty();
@@ -138,35 +139,6 @@ public class ElementItem extends Item {
         ItemStack stack = super.getDefaultInstance();
         stack.set(ModDataComponents.ATOM_DATA.value(), AtomData.DEFAULT);
         return stack;
-    }
-
-
-    public record ElementTooltip(AtomData data) implements TooltipComponent {}
-
-    @OnlyIn(Dist.CLIENT)
-    public static class ClientElementTooltip implements ClientTooltipComponent {
-        private final AtomData data;
-
-        public ClientElementTooltip(ElementTooltip elementTooltip) {
-            this.data = elementTooltip.data;
-        }
-
-        @Override
-        public int getHeight() {
-            return 160;
-        }
-
-        @Override
-        public int getWidth(Font font) {
-            return 160;
-        }
-
-        @Override
-        public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
-            guiGraphics.fill(x, y, x + 160, y + 160, 0xFF00FF);
-
-            guiGraphics.flush();
-        }
     }
 
 
