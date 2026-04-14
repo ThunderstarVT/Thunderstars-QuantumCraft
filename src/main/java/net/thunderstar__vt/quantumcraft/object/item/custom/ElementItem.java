@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -143,21 +144,28 @@ public class ElementItem extends Item {
     public record ElementTooltip(AtomData data) implements TooltipComponent {}
 
     @OnlyIn(Dist.CLIENT)
-    public class ClientElementTooltip implements ClientTooltipComponent {
+    public static class ClientElementTooltip implements ClientTooltipComponent {
         private final AtomData data;
 
-        ClientElementTooltip(AtomData data) {
-            this.data = data;
+        public ClientElementTooltip(ElementTooltip elementTooltip) {
+            this.data = elementTooltip.data;
         }
 
         @Override
         public int getHeight() {
-            return 40;
+            return 160;
         }
 
         @Override
         public int getWidth(Font font) {
-            return 0;
+            return 160;
+        }
+
+        @Override
+        public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
+            guiGraphics.fill(x, y, x + 160, y + 160, 0xFF00FF);
+
+            guiGraphics.flush();
         }
     }
 

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
@@ -79,6 +80,11 @@ public class Main {
         @SubscribeEvent
         public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
             ModColorHandlers.registerItems(event);
+        }
+
+        @SubscribeEvent
+        public static void registerTooltipComponents(RegisterClientTooltipComponentFactoriesEvent event) {
+            event.register(ElementItem.ElementTooltip.class, ElementItem.ClientElementTooltip::new);
         }
     }
 }

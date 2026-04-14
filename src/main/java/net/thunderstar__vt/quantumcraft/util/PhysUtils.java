@@ -119,19 +119,23 @@ public class PhysUtils{
         return (PLANCK * SPEED_OF_LIGHT) / (energy * ELEMENTARY_CHARGE);
     }
 
-    public static Color wavelengthToColor(double wavelengthMeters) {
-        double nm = wavelengthMeters * 1e9;
+    public static Color wavelengthToColor(double wavelength) {
+        double num = Math.log(wavelength);
 
-        double r = MathUtils.gaussian(nm, 610, 60);
-        double g = MathUtils.gaussian(nm, 550, 50);
-        double b = MathUtils.gaussian(nm, 460, 40);
+        double r = MathUtils.gaussian(num, -14.2, 0.1);
+        double g = MathUtils.gaussian(num, -14.4, 0.1);
+        double b = MathUtils.gaussian(num, -14.6, 0.1);
 
         double max = Math.max(r, Math.max(g, b));
-        if (max > 0) {
+        if (max > 0.0) {
             r /= max;
             g /= max;
             b /= max;
         }
+
+        r *= MathUtils.gaussian(num, -14.4, 0.5);
+        g *= MathUtils.gaussian(num, -14.4, 0.5);
+        b *= MathUtils.gaussian(num, -14.4, 0.5);
 
         double gamma = 0.8;
 
