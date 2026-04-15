@@ -28,7 +28,6 @@ public class ModItemDecorators {
         PoseStack pose = guiGraphics.pose();
 
         pose.pushPose();
-
         pose.translate(0, 0, 200);
 
         guiGraphics.drawString(font, symbolStr,
@@ -57,6 +56,21 @@ public class ModItemDecorators {
         guiGraphics.drawString(font, data.muonic() ? "μ" : "e",
                 3*x + 3, 3*y + 45 - font.lineHeight,
                 0xFFFFFF, true);
+
+        pose.popPose();
+
+        return true;
+    };
+
+    public static final IItemDecorator PARTICLE_DECORATOR = (guiGraphics, font, stack, x, y) -> {
+
+
+        PoseStack pose = guiGraphics.pose();
+
+        pose.pushPose();
+        pose.translate(0, 0, 200);
+
+
 
         pose.popPose();
 

@@ -6,6 +6,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.thunderstar__vt.quantumcraft.object.item.custom.ElementItem;
+import net.thunderstar__vt.quantumcraft.object.item.custom.ParticleItem;
 import net.thunderstar__vt.quantumcraft.object.item.custom.PhotonItem;
 import net.thunderstar__vt.quantumcraft.util.Reference;
 
@@ -18,6 +19,13 @@ public class ModDataComponents {
                     () -> DataComponentType.<ElementItem.AtomData>builder()
                             .persistent(ElementItem.AtomData.CODEC)
                             .networkSynchronized(ElementItem.AtomData.STREAM_CODEC)
+                            .build());
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ParticleItem.ParticleData>> PARTICLE_DATA =
+            DATA_COMPONENTS.register("particle_data",
+                    () -> DataComponentType.<ParticleItem.ParticleData>builder()
+                            .persistent(ParticleItem.ParticleData.CODEC)
+                            .networkSynchronized(ParticleItem.ParticleData.STREAM_CODEC)
                             .build());
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<PhotonItem.PhotonData>> PHOTON_DATA =

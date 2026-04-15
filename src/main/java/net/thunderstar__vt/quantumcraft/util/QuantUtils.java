@@ -2,6 +2,7 @@ package net.thunderstar__vt.quantumcraft.util;
 
 import net.minecraft.network.chat.Component;
 import net.thunderstar__vt.quantumcraft.object.item.custom.ElementItem;
+import net.thunderstar__vt.quantumcraft.object.item.custom.ParticleItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,12 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 public class QuantUtils {
-    // measured constants
-    public static final double PROTON_MASS = 938_272_089.43;
-    public static final double NEUTRON_MASS = 939_565_421.94;
-    public static final double ELECTRON_MASS = 510_998.950_69;
-    public static final double MUON_MASS = 105_658_375.5;
-
     // conversion constants
     public static final double EV_TO_KG = 1.782_662_695_946e-36;
 
@@ -23,13 +18,13 @@ public class QuantUtils {
     public static double computeAtomMass(ElementItem.AtomData data) {
         if (cachedAtomMass.containsKey(data)) return cachedAtomMass.get(data);
 
-        double leptonMass = (data.muonic() ? MUON_MASS : ELECTRON_MASS);
+        double leptonMass = (data.muonic() ? ParticleItem.ParticleType.MUON.mass : ParticleItem.ParticleType.ELECTRON.mass);
 
         double bindingEnergyNuclear = getNuclearBindingEnergy(data.protons(), data.neutrons());
         double bindingEnergyLeptonic = getLeptonicBindingEnergy(data.protons(), data.neutrons(), data.electrons(), leptonMass);
 
-        double mass = Math.abs(data.protons()) * PROTON_MASS
-                + Math.abs(data.neutrons()) * NEUTRON_MASS
+        double mass = Math.abs(data.protons()) * ParticleItem.ParticleType.PROTON.mass
+                + Math.abs(data.neutrons()) * ParticleItem.ParticleType.NEUTRON.mass
                 + Math.abs(data.electrons()) * leptonMass
                 - bindingEnergyNuclear
                 - bindingEnergyLeptonic;
@@ -78,7 +73,7 @@ public class QuantUtils {
         double fineStruct = (PhysUtils.ELEMENTARY_CHARGE * PhysUtils.ELEMENTARY_CHARGE)
                 / (4 * Math.PI * PhysUtils.EPSILON_0 * PhysUtils.PLANCK_REDUCED * PhysUtils.SPEED_OF_LIGHT);
 
-        double nucleusMass = Math.abs(Z) * PROTON_MASS + Math.abs(N) * NEUTRON_MASS;
+        double nucleusMass = Math.abs(Z) * ParticleItem.ParticleType.PROTON.mass + Math.abs(N) * ParticleItem.ParticleType.NEUTRON.mass;
 
         double mu = (leptonMass * nucleusMass) / (leptonMass + nucleusMass);
 
@@ -114,10 +109,13 @@ public class QuantUtils {
             }
         }
 
-        double leptonMass = (data.muonic() ? MUON_MASS : ELECTRON_MASS);
+        double leptonMass = (data.muonic() ? ParticleItem.ParticleType.MUON.mass : ParticleItem.ParticleType.ELECTRON.mass);
 
-        double mu = (leptonMass * (Math.abs(data.protons())*PROTON_MASS + Math.abs(data.neutrons())*NEUTRON_MASS))
-                /(leptonMass + (Math.abs(data.protons())*PROTON_MASS + Math.abs(data.neutrons())*NEUTRON_MASS));
+        double v = Math.abs(data.neutrons()) * ParticleItem.ParticleType.NEUTRON.mass;
+        double v1 = Math.abs(data.protons()) * ParticleItem.ParticleType.PROTON.mass + v;
+
+        double mu = (leptonMass * v1)
+                /(leptonMass + v1);
 
         double bohrRadius = (4 * Math.PI * PhysUtils.EPSILON_0 * PhysUtils.PLANCK_REDUCED * PhysUtils.PLANCK_REDUCED)
                 / (PhysUtils.ELEMENTARY_CHARGE * PhysUtils.ELEMENTARY_CHARGE * EV_TO_KG * leptonMass);

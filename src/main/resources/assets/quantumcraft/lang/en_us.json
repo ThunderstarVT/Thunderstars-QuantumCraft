@@ -122,6 +122,8 @@
   "element.quantumcraft.oganesson": "Oganesson",
 
   "item.quantumcraft.element.format": "%1$s%2$s%3$s-%4$s%5$s",
+  "item.quantumcraft.particle.format": "%1$s%2$s",
+
   "item.quantumcraft.photon": "Photon",
 
   "key.categories.quantumcraft": "QuantumCraft",
@@ -135,7 +137,9 @@
   "text.quantumcraft.charge.positive": " +%1$s",
   "text.quantumcraft.charge.negative": " -%1$s",
 
-  "tooltip.quantumcraft.element.mass": "§bAtomic Mass: %1$s§r",
-  "tooltip.quantumcraft.element.size": "§bAtomic Radius: §e%1$s§b§r",
+  "tooltip.quantumcraft.element.mass": "§bAtomic Mass: §r%1$s§b§r",
+  "tooltip.quantumcraft.element.size": "§bAtomic Radius: §r%1$s§b§r",
+  "tooltip.quantumcraft.particle.mass": "§bParticle Mass: §r%1$s§b§r",
+  "tooltip.quantumcraft.particle.charge": "§bParticle Charge: §r%1$s§b§r",
   "tooltip.quantumcraft.hold_shift": "§7§oHold [§r%1$s§7§o] for details§r"
 }
