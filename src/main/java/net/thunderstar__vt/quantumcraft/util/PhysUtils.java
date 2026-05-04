@@ -113,6 +113,7 @@ public class PhysUtils{
     public static final double SPEED_OF_LIGHT = 299_792_458;
     public static final double ELEMENTARY_CHARGE = 1.602_176_634e-19;
     public static final double EPSILON_0 = 8.854_187_812_8e-12;
+    public static final double BOLTZMANN = 1.380_649e-23;
 
 
     public static double energyToWavelength(double energy) {
@@ -144,5 +145,20 @@ public class PhysUtils{
         int B = (int)(255 * Math.pow(b, gamma));
 
         return new Color(Math.clamp(R, 0, 255), Math.clamp(G, 0, 255), Math.clamp(B, 0, 255));
+    }
+
+
+    public static UtilTypes.HDRColor temperatureToColor(double temperature) {
+        return new UtilTypes.HDRColor(
+                temperatureToLuminosity(temperature, 6.807_981_34e-7),
+                temperatureToLuminosity(temperature, 5.573_903_69e-7),
+                temperatureToLuminosity(temperature, 4.563_526_37e-7)
+        );
+    }
+
+    public static double temperatureToLuminosity(double temerature, double wavelength) {
+        return (8.0 * Math.PI * PLANCK * SPEED_OF_LIGHT)
+                / (wavelength * wavelength * wavelength * wavelength * wavelength * (
+                        Math.exp((PLANCK * SPEED_OF_LIGHT) / (wavelength * BOLTZMANN * temerature)) - 1.0));
     }
 }

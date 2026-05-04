@@ -1,17 +1,105 @@
 package net.thunderstar__vt.quantumcraft.util;
 
-import net.minecraft.network.chat.Component;
+import net.minecraft.util.Tuple;
 import net.thunderstar__vt.quantumcraft.object.item.custom.ElementItem;
 import net.thunderstar__vt.quantumcraft.object.item.custom.ParticleItem;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class QuantUtils {
     // conversion constants
     public static final double EV_TO_KG = 1.782_662_695_946e-36;
+
+
+    public enum DecayMode {
+        MUON_DECAY,
+
+        // lepton
+        BETA_MINUS,
+        BETA_PLUS,
+        ELECTRON_CAPTURE,
+        POSITRON_CAPTURE,
+        ELECTRON_EMISSION,
+        POSITRON_EMISSION,
+
+        // nucleon
+        PROTON_EMISSION,
+        ANTI_PROTON_EMISSION,
+        NEUTRON_EMISSION,
+        ANTI_NEUTRON_EMISSION,
+
+        // cluster
+        ALPHA_DECAY,
+        ANTI_ALPHA_DECAY,
+    }
+
+    private static final Map<Tuple<ElementItem.AtomData, DecayMode>, Double> cachedDecayEnergy = new HashMap<>();
+    public static double getDecayEnergy(ElementItem.AtomData data, DecayMode mode) {
+        if (cachedDecayEnergy.containsKey(new Tuple<>(data, mode))) return cachedDecayEnergy.get(new Tuple<>(data, mode));
+
+        double energy = Double.NEGATIVE_INFINITY;
+
+        switch (mode) {
+            case MUON_DECAY -> {
+                if (data.muonic()) {
+                    energy = computeAtomMass(data) -
+                            (computeAtomMass(new ElementItem.AtomData(data.protons(), data.neutrons(), data.electrons(), false))
+                                    + Math.abs(data.electrons()) * (ParticleItem.ParticleType.MUON_NEUTRINO.mass + ParticleItem.ParticleType.ELECTRON_NEUTRINO.mass));
+                }
+            }
+
+            case BETA_MINUS -> energy = computeAtomMass(data) -
+                    (computeAtomMass(new ElementItem.AtomData(data.protons() + 1, data.neutrons() - 1, data.electrons(), data.muonic()))
+                            + ParticleItem.ParticleType.ELECTRON.mass + ParticleItem.ParticleType.ELECTRON_NEUTRINO.mass);
+
+            case BETA_PLUS -> energy = computeAtomMass(data) -
+                    (computeAtomMass(new ElementItem.AtomData(data.protons() - 1, data.neutrons() + 1, data.electrons(), data.muonic()))
+                            + ParticleItem.ParticleType.ELECTRON.mass + ParticleItem.ParticleType.ELECTRON_NEUTRINO.mass);
+
+            case ELECTRON_CAPTURE -> energy = computeAtomMass(data) -
+                    (computeAtomMass(new ElementItem.AtomData(data.protons() - 1, data.neutrons() + 1, data.electrons() - 1, data.muonic()))
+                            + (data.muonic() ? ParticleItem.ParticleType.MUON_NEUTRINO.mass : ParticleItem.ParticleType.ELECTRON_NEUTRINO.mass));
+
+            case POSITRON_CAPTURE -> energy = computeAtomMass(data) -
+                    (computeAtomMass(new ElementItem.AtomData(data.protons() + 1, data.neutrons() - 1, data.electrons() + 1, data.muonic()))
+                            + (data.muonic() ? ParticleItem.ParticleType.MUON_NEUTRINO.mass : ParticleItem.ParticleType.ELECTRON_NEUTRINO.mass));
+
+            case ELECTRON_EMISSION -> energy = computeAtomMass(data) -
+                    (computeAtomMass(new ElementItem.AtomData(data.protons(), data.neutrons(), data.electrons() - 1, data.muonic()))
+                            + (data.muonic() ? ParticleItem.ParticleType.MUON.mass : ParticleItem.ParticleType.ELECTRON.mass));
+
+            case POSITRON_EMISSION -> energy = computeAtomMass(data) -
+                    (computeAtomMass(new ElementItem.AtomData(data.protons(), data.neutrons(), data.electrons() + 1, data.muonic()))
+                            + (data.muonic() ? ParticleItem.ParticleType.MUON.mass : ParticleItem.ParticleType.ELECTRON.mass));
+
+            case PROTON_EMISSION -> energy = computeAtomMass(data) -
+                    (computeAtomMass(new ElementItem.AtomData(data.protons() - 1, data.neutrons(), data.electrons(), data.muonic()))
+                            + ParticleItem.ParticleType.PROTON.mass);
+
+            case ANTI_PROTON_EMISSION -> energy = computeAtomMass(data) -
+                    (computeAtomMass(new ElementItem.AtomData(data.protons() + 1, data.neutrons(), data.electrons(), data.muonic()))
+                            + ParticleItem.ParticleType.PROTON.mass);
+
+            case NEUTRON_EMISSION -> energy = computeAtomMass(data) -
+                    (computeAtomMass(new ElementItem.AtomData(data.protons(), data.neutrons() - 1, data.electrons(), data.muonic()))
+                            + ParticleItem.ParticleType.NEUTRON.mass);
+
+            case ANTI_NEUTRON_EMISSION -> energy = computeAtomMass(data) -
+                    (computeAtomMass(new ElementItem.AtomData(data.protons(), data.neutrons() + 1, data.electrons(), data.muonic()))
+                            + ParticleItem.ParticleType.NEUTRON.mass);
+
+            case ALPHA_DECAY -> energy = computeAtomMass(data) -
+                    (computeAtomMass(new ElementItem.AtomData(data.protons() - 2, data.neutrons() - 2, data.electrons(), data.muonic()))
+                            + computeAtomMass(new ElementItem.AtomData(2, 2, 0, false)));
+
+            case ANTI_ALPHA_DECAY -> energy = computeAtomMass(data) -
+                    (computeAtomMass(new ElementItem.AtomData(data.protons() + 2, data.neutrons() + 2, data.electrons(), data.muonic()))
+                            + computeAtomMass(new ElementItem.AtomData(-2, -2, 0, false)));
+        }
+
+        cachedDecayEnergy.put(new Tuple<>(data, mode), energy);
+        return energy;
+    }
 
 
     private static final Map<ElementItem.AtomData, Double> cachedAtomMass = new HashMap<>();
